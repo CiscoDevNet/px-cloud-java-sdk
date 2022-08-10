@@ -1,0 +1,2994 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: developer-support-pxcloud@cisco.com
+    name: API Support
+    url: https://cisco.com
+  description: CX Partner Portal APIs for the Partners - LA Release
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://cisco.com
+  title: CX Partner Portal APIs
+  version: 0.9.0
+servers:
+- description: US Prod Environment
+  url: https://api-cx.cisco.com/px
+  x-external-backend:
+    serviceType: ExternalName
+    serviceProtocol: https
+    servicePort: 443
+    externalName: api-cx.cisco.com
+    basePath: /px
+security:
+- oAuth2: []
+tags:
+- description: Partner data
+  externalDocs:
+    description: Find out more
+    url: https://cxpartner.cisco.com
+  name: Partner Data
+- description: Partner customer data
+  name: Customer Data
+- description: CX Meta data
+  externalDocs:
+    description: Find out more about APIs
+    url: https://cisco.com
+  name: CX Meta Data
+paths:
+  /v1/customers:
+    get:
+      description: Get list of Customers
+      operationId: getCustomers
+      parameters:
+      - description: The number of items to skip before starting to collect the result
+          set
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          minimum: 0
+          type: integer
+        style: form
+      - description: The numbers of items to return.
+        explode: true
+        in: query
+        name: max
+        required: false
+        schema:
+          default: 10
+          maximum: 100
+          minimum: 10
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+          description: successful operation
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal server error
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Service Unavailable
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "504":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway timeout
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+      summary: List of customers
+      tags:
+      - Partner Data
+      x-kong-rate-limiting-cisco:
+        limit_by: header
+        header_name: Authorization
+        second: 3
+      x-accepts: application/json
+  /v1/customers/{customerId}/lifecycle:
+    get:
+      description: "Get customer lifecycle which will provide the CX solution, use\
+        \ case and pitstop information for the customer"
+      operationId: getCustomersLifeCycle
+      parameters:
+      - explode: true
+        in: query
+        name: successTrackId
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: Unique identifier for the Customer
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RacetrackBuid'
+          description: successful operation
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal server error
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Service Unavailable
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "504":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway timeout
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+      summary: Get customer lifecycle
+      tags:
+      - Customer Data
+      x-kong-rate-limiting-cisco:
+        limit_by: header
+        header_name: Authorization
+        second: 3
+      x-accepts: application/json
+  /v1/customers/{customerId}/reports:
+    post:
+      description: "Request customer data report. Creating a request for customer\
+        \ data sets like Assets, Hardware, Software and Advisories bulk json files"
+      operationId: requestCustomerReport
+      parameters:
+      - description: Unique identifier for the Customer
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Report'
+        description: report infromation
+      responses:
+        "202":
+          description: Accepted
+          headers:
+            Location:
+              description: Report generation takes time and hence the report API is
+                asychronous. It will immediatly respond back with the status code
+                of 202 pointing to a temporary report status resource via Location
+                header
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+          headers:
+            Location:
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+          headers:
+            Location:
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+          headers:
+            Location:
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal server error
+          headers:
+            Location:
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Service Unavailable
+          headers:
+            Location:
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "504":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway timeout
+          headers:
+            Location:
+              explode: false
+              schema:
+                type: string
+              style: simple
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+      summary: Request customer data reports as bulk files
+      tags:
+      - Customer Data
+      x-kong-rate-limiting-cisco:
+        limit_by: header
+        header_name: Authorization
+        second: 3
+      x-content-type: application/json
+      x-accepts: application/json
+  /v1/customers/{customerId}/reports/{reportId}:
+    get:
+      description: Provides the status of resource. The status API provides additional
+        info about the progress of the report. Partner application should poll periodically
+        to get status of the report. When the report is complete the API responds
+        with the 303 status pointing to final report in the Location header.
+      operationId: getCustomerReport
+      parameters:
+      - description: Report id
+        explode: false
+        in: path
+        name: reportId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Unique identifier for the Customer
+        explode: false
+        in: path
+        name: customerId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ReportStatus'
+                type: array
+          description: Provides the status of the report
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "303":
+          description: Provides the final report resource to download the file
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+            Location:
+              description: downloadable URL
+              explode: false
+              schema:
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Not Found
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal server error
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Service Unavailable
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "504":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway timeout
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+      summary: Get the report
+      tags:
+      - Customer Data
+      x-kong-rate-limiting-cisco:
+        limit_by: header
+        header_name: Authorization
+        second: 3
+      x-accepts: application/json
+  /v1/contracts:
+    get:
+      description: Partner CX contracts transacted in cisco
+      operationId: getContracts
+      parameters:
+      - description: The number of items to skip before starting to collect the result
+          set
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          minimum: 0
+          type: integer
+        style: form
+      - description: The numbers of items to return.
+        explode: true
+        in: query
+        name: max
+        required: false
+        schema:
+          default: 10
+          maximum: 100
+          minimum: 10
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractResponse'
+          description: successful operation
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal server error
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Service Unavailable
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "504":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway timeout
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+      summary: List of contracts
+      tags:
+      - Partner Data
+      x-kong-rate-limiting-cisco:
+        limit_by: header
+        header_name: Authorization
+        second: 3
+      x-accepts: application/json
+  /v1/contract/details:
+    get:
+      operationId: fetchContractsDetailsUsingGET
+      parameters:
+      - description: componentType
+        explode: true
+        in: query
+        name: componentType
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: contractNumber
+        explode: true
+        in: query
+        name: contractNumber
+        required: true
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: customerId
+        explode: true
+        in: query
+        name: customerId
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: puid
+        explode: false
+        in: header
+        name: puid
+        required: true
+        schema:
+          format: int32
+          type: integer
+        style: simple
+      - description: successTrackId
+        explode: true
+        in: query
+        name: successTrackId
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataPaginationResponse'
+          description: Successfully Fetched Contract Details for Given Partner
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsErrorResponse'
+          description: Bad Input
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsErrorResponse'
+          description: Unauthorized
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsErrorResponse'
+          description: Forbidden
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsErrorResponse'
+          description: Entity Not Found
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsErrorResponse'
+          description: Error during fetch
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+      summary: "Get the list of contracts Details from flat table. It supports pagination\
+        \ , filtering and sorting"
+      tags:
+      - Customer Data
+      x-kong-rate-limiting-cisco:
+        limit_by: header
+        header_name: Authorization
+        second: 3
+      x-accepts: application/json
+  /v2/contracts:
+    get:
+      operationId: fetchContractsSummaryUsingGET
+      parameters:
+      - description: customerId
+        explode: true
+        in: query
+        name: customerId
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: successTrackId
+        explode: true
+        in: query
+        name: successTrackId
+        required: true
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: guName
+        explode: true
+        in: query
+        name: guName
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: puid
+        explode: false
+        in: header
+        name: puid
+        required: true
+        schema:
+          format: int32
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataPaginationResponse'
+          description: Successfully Fetched Contract Summary for Given Partner
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsErrorResponse'
+          description: Bad Input
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsErrorResponse'
+          description: Unauthorized
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsErrorResponse'
+          description: Forbidden
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsErrorResponse'
+          description: Entity Not Found
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractsErrorResponse'
+          description: Error during fetch
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+      summary: Get the list of contracts summary
+      tags:
+      - Contracts Data
+      x-kong-rate-limiting-cisco:
+        limit_by: header
+        header_name: Authorization
+        second: 3
+      x-accepts: application/json
+  /v1/successTracks:
+    get:
+      description: Partner Success Tracks
+      operationId: getSuccessTracks
+      responses:
+        "200":
+          content: {}
+          description: 200 response
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal server error
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Service Unavailable
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "504":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway timeout
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+      summary: Success Tracks
+      tags:
+      - Partner Data
+      x-kong-rate-limiting-cisco:
+        limit_by: header
+        header_name: Authorization
+        second: 3
+      x-accepts: application/json
+  /v1/partnerOffers:
+    get:
+      description: Partner Offers
+      operationId: getPartnerOffers
+      parameters:
+      - allowEmptyValue: false
+        description: Customer Id's for filtering the results
+        explode: true
+        in: query
+        name: customerId
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: Status for filtering the results
+        explode: true
+        in: query
+        name: offerStatus
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: Asset Type for filtering the results
+        explode: true
+        in: query
+        name: offerType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: Page number. Default value is 1
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int32
+          type: integer
+        style: form
+      - allowEmptyValue: false
+        description: Pagination data required flag
+        explode: true
+        in: query
+        name: paginationRequired
+        required: false
+        schema:
+          default: true
+          type: boolean
+        style: form
+      - description: Partner ID for filtering the results
+        explode: false
+        in: header
+        name: partnerId
+        required: false
+        schema:
+          items:
+            format: int32
+            type: integer
+          type: array
+        style: simple
+      - allowEmptyValue: false
+        description: No of rows in a page. Default value is 10 and the maximum rows
+          allowed per page is 100
+        explode: true
+        in: query
+        name: rows
+        required: false
+        schema:
+          default: 10
+          format: int32
+          type: integer
+        style: form
+      - allowEmptyValue: false
+        description: Solution Id field for filtering the results
+        explode: true
+        in: query
+        name: successTrackId
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerOffersInfo'
+          description: 200 response
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal server error
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Service Unavailable
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "504":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway timeout
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+      summary: Get Partner Offers
+      tags:
+      - Partner Offers Data
+      x-kong-rate-limiting-cisco:
+        limit_by: header
+        header_name: Authorization
+        second: 3
+      x-accepts: application/json
+  /v1/partnerOffersSessions:
+    get:
+      description: Information about Partner offers sessions - Ask the Experts and
+        Accelerator
+      operationId: getPartnerOffersSessions
+      parameters:
+      - allowEmptyValue: false
+        description: Customer Id's for filtering the results
+        explode: true
+        in: query
+        name: customerId
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: published Asset Id from Path Params
+        explode: true
+        in: query
+        name: offerId
+        required: false
+        schema:
+          type: string
+        style: form
+      - allowEmptyValue: false
+        description: Status for filtering the results
+        explode: true
+        in: query
+        name: offerStatus
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: Asset Type for filtering the results
+        explode: true
+        in: query
+        name: offerType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - allowEmptyValue: false
+        description: Page number. Default value is 1
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          format: int32
+          type: integer
+        style: form
+      - allowEmptyValue: false
+        description: Pagination data required flag
+        explode: true
+        in: query
+        name: paginationRequired
+        required: false
+        schema:
+          default: true
+          type: boolean
+        style: form
+      - description: Partner ID for filtering the results
+        explode: false
+        in: header
+        name: partnerId
+        required: false
+        schema:
+          items:
+            format: int32
+            type: integer
+          type: array
+        style: simple
+      - allowEmptyValue: false
+        description: No of rows in a page. Default value is 10 and the maximum rows
+          allowed per page is 100
+        explode: true
+        in: query
+        name: rows
+        required: false
+        schema:
+          default: 10
+          format: int32
+          type: integer
+        style: form
+      - allowEmptyValue: false
+        description: Solution Id field for filtering the results
+        explode: true
+        in: query
+        name: successTrackId
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerOfferWithSessions'
+          description: 200 response
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Bad Request
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Forbidden
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Internal server error
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "503":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Service Unavailable
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+        "504":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Gateway timeout
+          headers:
+            Date:
+              explode: false
+              schema:
+                format: date-time
+                type: string
+              style: simple
+      summary: Get Info about Partner Offers Sessions
+      tags:
+      - Partner Offers Sessions Data
+      x-kong-rate-limiting-cisco:
+        limit_by: header
+        header_name: Authorization
+        second: 3
+      x-accepts: application/json
+components:
+  parameters:
+    offsetParam:
+      description: The number of items to skip before starting to collect the result
+        set
+      explode: true
+      in: query
+      name: offset
+      required: false
+      schema:
+        minimum: 0
+        type: integer
+      style: form
+    maxParam:
+      description: The numbers of items to return.
+      explode: true
+      in: query
+      name: max
+      required: false
+      schema:
+        default: 10
+        maximum: 100
+        minimum: 10
+        type: integer
+      style: form
+  schemas:
+    Customer:
+      example:
+        customerId: customerId
+        customerName: customerName
+      properties:
+        customerId:
+          type: string
+        customerName:
+          format: int64
+          type: string
+      type: object
+    CustomerResponse:
+      example:
+        data:
+        - customerId: customerId
+          customerName: customerName
+        - customerId: customerId
+          customerName: customerName
+        totalCount: 0
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/Customer'
+          type: array
+        totalCount:
+          format: int32
+          type: integer
+      title: ContractResponse
+      type: object
+    ErrorResponse:
+      description: Error Message.
+      properties:
+        statusCode:
+          format: int64
+          type: integer
+        message:
+          type: string
+      type: object
+    ReportStatus:
+      example:
+        estimatedCompletionTime: 2000-01-23T04:56:07.000+00:00
+        suggestedNextPollTime: 2000-01-23T04:56:07.000+00:00
+        status: status
+      properties:
+        status:
+          type: string
+        suggestedNextPollTime:
+          format: date-time
+          type: string
+        estimatedCompletionTime:
+          format: date-time
+          type: string
+      type: object
+    Report:
+      example:
+        reportName: Assets
+      properties:
+        reportName:
+          description: Report containing data for the given customer
+          enum:
+          - Assets
+          - Hardware
+          - Software
+          - Advisories
+          type: string
+      type: object
+    PartnerAsset:
+      properties:
+        assetId:
+          type: string
+        assetType:
+          type: string
+        complies:
+          type: boolean
+        createdBy:
+          type: string
+        customer:
+          items:
+            type: string
+          type: array
+        customerRating:
+          format: double
+          type: number
+        description:
+          type: string
+        duration:
+          format: int64
+          type: integer
+        imageFileName:
+          type: string
+        imageUrl:
+          type: string
+        lastUpdated:
+          format: date-time
+          type: string
+        mapping:
+          items:
+            $ref: '#/components/schemas/SolutionMapping'
+          type: array
+        partnerId:
+          type: string
+        partnerName:
+          type: string
+        partnerUserEmailId:
+          type: string
+        partnerUserFirstName:
+          type: string
+        partnerUserLastName:
+          type: string
+        pitstops:
+          type: string
+        recordingUrl:
+          type: string
+        sessions:
+          items:
+            $ref: '#/components/schemas/AssetSession'
+          type: array
+        solutions:
+          type: string
+        status:
+          type: string
+        technologyArea:
+          type: string
+        title:
+          type: string
+        usecases:
+          type: string
+      title: PartnerAsset
+      type: object
+    SolutionMapping:
+      properties:
+        pitstop:
+          type: string
+        solution:
+          type: string
+        usecase:
+          type: string
+      title: SolutionMapping
+      type: object
+    AssetSession:
+      properties:
+        additionalAttendees:
+          items:
+            $ref: '#/components/schemas/AccSessionAttendees'
+          type: array
+        businessOutcome:
+          type: string
+        ccoId:
+          type: string
+        companyName:
+          type: string
+        customerId:
+          type: string
+        dnacVersion:
+          type: string
+        environment:
+          type: string
+        preferredLanguage:
+          type: string
+        preferredSlot:
+          type: string
+        presenterName:
+          type: string
+        reasonForInterest:
+          type: string
+        sessionId:
+          type: string
+        sessionStartDate:
+          format: date-time
+          type: string
+        status:
+          type: string
+        timezone:
+          type: string
+        userEmail:
+          type: string
+        userFullName:
+          type: string
+      title: AssetSession'
+      type: object
+    AccSessionAttendees:
+      properties:
+        attendeeEmail:
+          type: string
+        attendeeName:
+          type: string
+      title: AccSessionAttendees
+      type: object
+    PartnerAssetResponse:
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/PartnerAsset'
+          type: array
+        totalCount:
+          format: int32
+          type: integer
+      title: PartnerAssetResponse
+      type: object
+    Pagination:
+      example:
+        total: 7
+        offset: 5
+        max: 2
+      properties:
+        offset:
+          format: int32
+          type: integer
+        max:
+          format: int32
+          type: integer
+        total:
+          format: int32
+          type: integer
+      title: Pagination
+      type: object
+    RacetrackBuid:
+      example:
+        buId: buId
+        cavId: cavId
+        customerId: customerId
+        items:
+        - cxLevel: 0.8008281904610115
+          name: name
+          description: description
+          solutionId: solutionId
+          usecases:
+          - adoptionPercentage: 5
+            name: name
+            description: description
+            pitstops:
+            - pitstopActions:
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              completionPercentage: 1
+              name: name
+              description: description
+              isComplete: true
+            - pitstopActions:
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              completionPercentage: 1
+              name: name
+              description: description
+              isComplete: true
+            usecaseId: usecaseId
+            currentPitstop: currentPitstop
+          - adoptionPercentage: 5
+            name: name
+            description: description
+            pitstops:
+            - pitstopActions:
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              completionPercentage: 1
+              name: name
+              description: description
+              isComplete: true
+            - pitstopActions:
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              completionPercentage: 1
+              name: name
+              description: description
+              isComplete: true
+            usecaseId: usecaseId
+            currentPitstop: currentPitstop
+        - cxLevel: 0.8008281904610115
+          name: name
+          description: description
+          solutionId: solutionId
+          usecases:
+          - adoptionPercentage: 5
+            name: name
+            description: description
+            pitstops:
+            - pitstopActions:
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              completionPercentage: 1
+              name: name
+              description: description
+              isComplete: true
+            - pitstopActions:
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              completionPercentage: 1
+              name: name
+              description: description
+              isComplete: true
+            usecaseId: usecaseId
+            currentPitstop: currentPitstop
+          - adoptionPercentage: 5
+            name: name
+            description: description
+            pitstops:
+            - pitstopActions:
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              completionPercentage: 1
+              name: name
+              description: description
+              isComplete: true
+            - pitstopActions:
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              - isCompleteManual: true
+                isCompleteAuto: true
+                name: name
+                description: description
+                isManualCheckAllowed: true
+                isManaualOverride: true
+                tooltips:
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                - sequence: 6.027456183070403
+                  tooltip: tooltip
+                isComplete: true
+                updateMethod: NA
+              completionPercentage: 1
+              name: name
+              description: description
+              isComplete: true
+            usecaseId: usecaseId
+            currentPitstop: currentPitstop
+        buName: buName
+      properties:
+        buId:
+          description: Customer buId
+          type: string
+        cavId:
+          description: Customer cavId
+          type: string
+        buName:
+          description: BuName
+          type: string
+        customerId:
+          description: Customer Id
+          type: string
+        items:
+          items:
+            $ref: '#/components/schemas/RacetrackBuidSolution'
+          type: array
+      required:
+      - buId
+      - buName
+      - cavId
+      - customerId
+      type: object
+    RacetrackBuidSolution:
+      example:
+        cxLevel: 0.8008281904610115
+        name: name
+        description: description
+        solutionId: solutionId
+        usecases:
+        - adoptionPercentage: 5
+          name: name
+          description: description
+          pitstops:
+          - pitstopActions:
+            - isCompleteManual: true
+              isCompleteAuto: true
+              name: name
+              description: description
+              isManualCheckAllowed: true
+              isManaualOverride: true
+              tooltips:
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              isComplete: true
+              updateMethod: NA
+            - isCompleteManual: true
+              isCompleteAuto: true
+              name: name
+              description: description
+              isManualCheckAllowed: true
+              isManaualOverride: true
+              tooltips:
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              isComplete: true
+              updateMethod: NA
+            completionPercentage: 1
+            name: name
+            description: description
+            isComplete: true
+          - pitstopActions:
+            - isCompleteManual: true
+              isCompleteAuto: true
+              name: name
+              description: description
+              isManualCheckAllowed: true
+              isManaualOverride: true
+              tooltips:
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              isComplete: true
+              updateMethod: NA
+            - isCompleteManual: true
+              isCompleteAuto: true
+              name: name
+              description: description
+              isManualCheckAllowed: true
+              isManaualOverride: true
+              tooltips:
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              isComplete: true
+              updateMethod: NA
+            completionPercentage: 1
+            name: name
+            description: description
+            isComplete: true
+          usecaseId: usecaseId
+          currentPitstop: currentPitstop
+        - adoptionPercentage: 5
+          name: name
+          description: description
+          pitstops:
+          - pitstopActions:
+            - isCompleteManual: true
+              isCompleteAuto: true
+              name: name
+              description: description
+              isManualCheckAllowed: true
+              isManaualOverride: true
+              tooltips:
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              isComplete: true
+              updateMethod: NA
+            - isCompleteManual: true
+              isCompleteAuto: true
+              name: name
+              description: description
+              isManualCheckAllowed: true
+              isManaualOverride: true
+              tooltips:
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              isComplete: true
+              updateMethod: NA
+            completionPercentage: 1
+            name: name
+            description: description
+            isComplete: true
+          - pitstopActions:
+            - isCompleteManual: true
+              isCompleteAuto: true
+              name: name
+              description: description
+              isManualCheckAllowed: true
+              isManaualOverride: true
+              tooltips:
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              isComplete: true
+              updateMethod: NA
+            - isCompleteManual: true
+              isCompleteAuto: true
+              name: name
+              description: description
+              isManualCheckAllowed: true
+              isManaualOverride: true
+              tooltips:
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              - sequence: 6.027456183070403
+                tooltip: tooltip
+              isComplete: true
+              updateMethod: NA
+            completionPercentage: 1
+            name: name
+            description: description
+            isComplete: true
+          usecaseId: usecaseId
+          currentPitstop: currentPitstop
+      properties:
+        name:
+          description: Solution name
+          type: string
+        solutionId:
+          description: Solution Id
+          type: string
+        description:
+          description: Solution Description
+          type: string
+        cxLevel:
+          description: Cx Level
+          type: number
+        usecases:
+          items:
+            $ref: '#/components/schemas/RacetrackUsecase'
+          type: array
+      required:
+      - cxLevel
+      - description
+      - name
+      - solutionId
+      - usecases
+      type: object
+    RacetrackUsecase:
+      example:
+        adoptionPercentage: 5
+        name: name
+        description: description
+        pitstops:
+        - pitstopActions:
+          - isCompleteManual: true
+            isCompleteAuto: true
+            name: name
+            description: description
+            isManualCheckAllowed: true
+            isManaualOverride: true
+            tooltips:
+            - sequence: 6.027456183070403
+              tooltip: tooltip
+            - sequence: 6.027456183070403
+              tooltip: tooltip
+            isComplete: true
+            updateMethod: NA
+          - isCompleteManual: true
+            isCompleteAuto: true
+            name: name
+            description: description
+            isManualCheckAllowed: true
+            isManaualOverride: true
+            tooltips:
+            - sequence: 6.027456183070403
+              tooltip: tooltip
+            - sequence: 6.027456183070403
+              tooltip: tooltip
+            isComplete: true
+            updateMethod: NA
+          completionPercentage: 1
+          name: name
+          description: description
+          isComplete: true
+        - pitstopActions:
+          - isCompleteManual: true
+            isCompleteAuto: true
+            name: name
+            description: description
+            isManualCheckAllowed: true
+            isManaualOverride: true
+            tooltips:
+            - sequence: 6.027456183070403
+              tooltip: tooltip
+            - sequence: 6.027456183070403
+              tooltip: tooltip
+            isComplete: true
+            updateMethod: NA
+          - isCompleteManual: true
+            isCompleteAuto: true
+            name: name
+            description: description
+            isManualCheckAllowed: true
+            isManaualOverride: true
+            tooltips:
+            - sequence: 6.027456183070403
+              tooltip: tooltip
+            - sequence: 6.027456183070403
+              tooltip: tooltip
+            isComplete: true
+            updateMethod: NA
+          completionPercentage: 1
+          name: name
+          description: description
+          isComplete: true
+        usecaseId: usecaseId
+        currentPitstop: currentPitstop
+      properties:
+        name:
+          description: Usecase name
+          type: string
+        description:
+          description: Usecase description
+          type: string
+        usecaseId:
+          description: Usecase description
+          type: string
+        currentPitstop:
+          description: The current customer's pitstop for this solution's use case
+          type: string
+        pitstops:
+          items:
+            $ref: '#/components/schemas/RacetrackBuidPitstop'
+          type: array
+        adoptionPercentage:
+          description: Percentage completed checklist actions across all pitstops.
+          type: integer
+      required:
+      - adoptionPercentage
+      - currentPitstop
+      - description
+      - name
+      - pitstops
+      - usecaseId
+      type: object
+    RacetrackBuidPitstop:
+      example:
+        pitstopActions:
+        - isCompleteManual: true
+          isCompleteAuto: true
+          name: name
+          description: description
+          isManualCheckAllowed: true
+          isManaualOverride: true
+          tooltips:
+          - sequence: 6.027456183070403
+            tooltip: tooltip
+          - sequence: 6.027456183070403
+            tooltip: tooltip
+          isComplete: true
+          updateMethod: NA
+        - isCompleteManual: true
+          isCompleteAuto: true
+          name: name
+          description: description
+          isManualCheckAllowed: true
+          isManaualOverride: true
+          tooltips:
+          - sequence: 6.027456183070403
+            tooltip: tooltip
+          - sequence: 6.027456183070403
+            tooltip: tooltip
+          isComplete: true
+          updateMethod: NA
+        completionPercentage: 1
+        name: name
+        description: description
+        isComplete: true
+      properties:
+        name:
+          description: The name of the pitstop (onboard | implement | use | engage
+            | adopt | optimize)
+          type: string
+        description:
+          description: Brief description of the pitstop
+          type: string
+        isComplete:
+          description: When set to true it indicates that the pre-requisites for advancing
+            to the next pitstop have been met by the customer. This determination
+            may be done through manual input (customer) or automated (LifecycleJourney).
+          type: boolean
+        pitstopActions:
+          items:
+            $ref: '#/components/schemas/RacetrackBuidPitstopAction'
+          type: array
+        completionPercentage:
+          description: Percentage completed checklist actions.
+          type: integer
+      required:
+      - description
+      - isComplete
+      - name
+      - pitstopActions
+      type: object
+    RacetrackBuidPitstopAction:
+      example:
+        isCompleteManual: true
+        isCompleteAuto: true
+        name: name
+        description: description
+        isManualCheckAllowed: true
+        isManaualOverride: true
+        tooltips:
+        - sequence: 6.027456183070403
+          tooltip: tooltip
+        - sequence: 6.027456183070403
+          tooltip: tooltip
+        isComplete: true
+        updateMethod: NA
+      properties:
+        name:
+          description: A label identifying the action to be completed by the customer.  A
+            set of actions identifies the exit criteria that must be met before proceeding
+            to the next stage
+          type: string
+        description:
+          description: A brief description of the action to be taken by the customer
+          type: string
+        isManualCheckAllowed:
+          description: When set to true it indicates that this action may be manually
+            checked as completed/met. Otherwise completion must be automatically determined
+            via analysis of collected data
+          type: boolean
+        isComplete:
+          description: "When set to true it indicates that this action has been completed\
+            \ by the customer.  This is the reported status and it is set from one\
+            \ of isActionCompleteAuto (Auto determined), isActionCompleteManual (Manually\
+            \ determined). Manual input takes precedence over the automated means\
+            \ and once set to manual it cannot be changed by automated means. It requires\
+            \ manual input"
+          type: boolean
+        updateMethod:
+          description: "The method by which the the completion status was updated\
+            \ (MANUAL user input, AUTO Lifecycle Journey). This value must be set\
+            \ when isActionComplete is set to true and cleared if isActionComplte\
+            \ is set to false"
+          enum:
+          - NA
+          - MANUAL
+          - AUTO
+          type: string
+        isCompleteAuto:
+          description: When set to true it indicates that this action was found to
+            be completed/met through automated means.  An action manually set to completion
+            takes precedence over the automated means.  An action set to completion
+            via automated means may be manually overridden
+          type: boolean
+        isCompleteManual:
+          description: When set to true it indicates that action was manually set
+            to completed / met
+          type: boolean
+        isManaualOverride:
+          description: When set to true it indicates that the automated result was
+            overriden manually by a user
+          type: boolean
+        tooltips:
+          items:
+            $ref: '#/components/schemas/RacetrackTooltip'
+          type: array
+      required:
+      - description
+      - isComplete
+      - isCompleteAuto
+      - isCompleteManual
+      - isManaualOverride
+      - isManualCheckAllowed
+      - name
+      - tooltips
+      - updateMethod
+      type: object
+    RacetrackTooltip:
+      example:
+        sequence: 6.027456183070403
+        tooltip: tooltip
+      properties:
+        sequence:
+          description: Sequence of the tooltip
+          type: number
+        tooltip:
+          description: tooltip name
+          type: string
+      required:
+      - sequence
+      - tooltip
+      type: object
+    ContractInfo:
+      example:
+        contractValue: 0.8008281904610115
+        country: country
+        contractStatus: contractStatus
+        cuid: 6
+        endCustGuName: endCustGuName
+        city: city
+        endDate: 2000-01-23T04:56:07.000+00:00
+        countryCode: countryCode
+        contractNumber: contractNumber
+        currency: currency
+        startDate: 2000-01-23T04:56:07.000+00:00
+      properties:
+        city:
+          type: string
+        contractNumber:
+          type: string
+        contractStatus:
+          type: string
+        contractValue:
+          format: double
+          type: number
+        country:
+          type: string
+        countryCode:
+          type: string
+        cuid:
+          format: int32
+          type: integer
+        currency:
+          type: string
+        endCustGuName:
+          type: string
+        endDate:
+          format: date-time
+          type: string
+        startDate:
+          format: date-time
+          type: string
+      title: ContractInfo
+      type: object
+    ContractResponse:
+      example:
+        data:
+        - contractValue: 0.8008281904610115
+          country: country
+          contractStatus: contractStatus
+          cuid: 6
+          endCustGuName: endCustGuName
+          city: city
+          endDate: 2000-01-23T04:56:07.000+00:00
+          countryCode: countryCode
+          contractNumber: contractNumber
+          currency: currency
+          startDate: 2000-01-23T04:56:07.000+00:00
+        - contractValue: 0.8008281904610115
+          country: country
+          contractStatus: contractStatus
+          cuid: 6
+          endCustGuName: endCustGuName
+          city: city
+          endDate: 2000-01-23T04:56:07.000+00:00
+          countryCode: countryCode
+          contractNumber: contractNumber
+          currency: currency
+          startDate: 2000-01-23T04:56:07.000+00:00
+        totalCount: 1
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/ContractInfo'
+          type: array
+        totalCount:
+          format: int32
+          type: integer
+      title: ContractResponse
+      type: object
+    PartnerOffersInfo:
+      example:
+        pagination:
+          total: 7
+          offset: 5
+          max: 2
+        data:
+        - publishedToAllCustomers: true
+          mapping:
+          - checklists:
+            - mappingChecklistId: mappingChecklistId
+              checklist: checklist
+              checklistId: checklistId
+            - mappingChecklistId: mappingChecklistId
+              checklist: checklist
+              checklistId: checklistId
+            mappingId: mappingId
+            pitstop: pitstop
+            usecase: usecase
+            pitstopId: pitstopId
+            successTrackId: successTrackId
+            successTrackName: successTrackName
+            usecaseId: usecaseId
+          - checklists:
+            - mappingChecklistId: mappingChecklistId
+              checklist: checklist
+              checklistId: checklistId
+            - mappingChecklistId: mappingChecklistId
+              checklist: checklist
+              checklistId: checklistId
+            mappingId: mappingId
+            pitstop: pitstop
+            usecase: usecase
+            pitstopId: pitstopId
+            successTrackId: successTrackId
+            successTrackName: successTrackName
+            usecaseId: usecaseId
+          lastPublishedDate: 2000-01-23T04:56:07.000+00:00
+          created: 2000-01-23T04:56:07.000+00:00
+          logoFileName: logoFileName
+          description: description
+          language: language
+          userFirstName: userFirstName
+          title: title
+          accTimeRequiredHours: 0.8008282
+          duration: 1
+          offerType: offerType
+          customerRating: 6.027456183070403
+          userEmailId: userEmailId
+          createdBy: createdBy
+          userLastName: userLastName
+          imageFileName: imageFileName
+          modified: 2000-01-23T04:56:07.000+00:00
+          offerId: offerId
+          customerList:
+          - companyName: companyName
+            customerId: customerId
+            customerEntryId: customerEntryId
+          - companyName: companyName
+            customerId: customerId
+            customerEntryId: customerEntryId
+          modifiedBy: modifiedBy
+          noOfAttendees: 5
+          status: status
+        - publishedToAllCustomers: true
+          mapping:
+          - checklists:
+            - mappingChecklistId: mappingChecklistId
+              checklist: checklist
+              checklistId: checklistId
+            - mappingChecklistId: mappingChecklistId
+              checklist: checklist
+              checklistId: checklistId
+            mappingId: mappingId
+            pitstop: pitstop
+            usecase: usecase
+            pitstopId: pitstopId
+            successTrackId: successTrackId
+            successTrackName: successTrackName
+            usecaseId: usecaseId
+          - checklists:
+            - mappingChecklistId: mappingChecklistId
+              checklist: checklist
+              checklistId: checklistId
+            - mappingChecklistId: mappingChecklistId
+              checklist: checklist
+              checklistId: checklistId
+            mappingId: mappingId
+            pitstop: pitstop
+            usecase: usecase
+            pitstopId: pitstopId
+            successTrackId: successTrackId
+            successTrackName: successTrackName
+            usecaseId: usecaseId
+          lastPublishedDate: 2000-01-23T04:56:07.000+00:00
+          created: 2000-01-23T04:56:07.000+00:00
+          logoFileName: logoFileName
+          description: description
+          language: language
+          userFirstName: userFirstName
+          title: title
+          accTimeRequiredHours: 0.8008282
+          duration: 1
+          offerType: offerType
+          customerRating: 6.027456183070403
+          userEmailId: userEmailId
+          createdBy: createdBy
+          userLastName: userLastName
+          imageFileName: imageFileName
+          modified: 2000-01-23T04:56:07.000+00:00
+          offerId: offerId
+          customerList:
+          - companyName: companyName
+            customerId: customerId
+            customerEntryId: customerEntryId
+          - companyName: companyName
+            customerId: customerId
+            customerEntryId: customerEntryId
+          modifiedBy: modifiedBy
+          noOfAttendees: 5
+          status: status
+        errors:
+        - severity: Low
+          field: field
+          message: message
+        - severity: Low
+          field: field
+          message: message
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/PartnerOffer'
+          type: array
+        errors:
+          items:
+            $ref: '#/components/schemas/AssetError'
+          type: array
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      type: object
+    PartnerOffer:
+      example:
+        publishedToAllCustomers: true
+        mapping:
+        - checklists:
+          - mappingChecklistId: mappingChecklistId
+            checklist: checklist
+            checklistId: checklistId
+          - mappingChecklistId: mappingChecklistId
+            checklist: checklist
+            checklistId: checklistId
+          mappingId: mappingId
+          pitstop: pitstop
+          usecase: usecase
+          pitstopId: pitstopId
+          successTrackId: successTrackId
+          successTrackName: successTrackName
+          usecaseId: usecaseId
+        - checklists:
+          - mappingChecklistId: mappingChecklistId
+            checklist: checklist
+            checklistId: checklistId
+          - mappingChecklistId: mappingChecklistId
+            checklist: checklist
+            checklistId: checklistId
+          mappingId: mappingId
+          pitstop: pitstop
+          usecase: usecase
+          pitstopId: pitstopId
+          successTrackId: successTrackId
+          successTrackName: successTrackName
+          usecaseId: usecaseId
+        lastPublishedDate: 2000-01-23T04:56:07.000+00:00
+        created: 2000-01-23T04:56:07.000+00:00
+        logoFileName: logoFileName
+        description: description
+        language: language
+        userFirstName: userFirstName
+        title: title
+        accTimeRequiredHours: 0.8008282
+        duration: 1
+        offerType: offerType
+        customerRating: 6.027456183070403
+        userEmailId: userEmailId
+        createdBy: createdBy
+        userLastName: userLastName
+        imageFileName: imageFileName
+        modified: 2000-01-23T04:56:07.000+00:00
+        offerId: offerId
+        customerList:
+        - companyName: companyName
+          customerId: customerId
+          customerEntryId: customerEntryId
+        - companyName: companyName
+          customerId: customerId
+          customerEntryId: customerEntryId
+        modifiedBy: modifiedBy
+        noOfAttendees: 5
+        status: status
+      properties:
+        accTimeRequiredHours:
+          format: float
+          type: number
+        created:
+          format: date-time
+          type: string
+        createdBy:
+          type: string
+        customerList:
+          items:
+            $ref: '#/components/schemas/CustomerInfo'
+          type: array
+        customerRating:
+          format: double
+          type: number
+        description:
+          type: string
+        duration:
+          format: int64
+          type: integer
+        imageFileName:
+          type: string
+        language:
+          type: string
+        lastPublishedDate:
+          format: date-time
+          type: string
+        logoFileName:
+          type: string
+        mapping:
+          items:
+            $ref: '#/components/schemas/SuccessTrackMapping'
+          type: array
+        modified:
+          format: date-time
+          type: string
+        modifiedBy:
+          type: string
+        noOfAttendees:
+          format: int64
+          type: integer
+        offerId:
+          type: string
+        offerType:
+          type: string
+        publishedToAllCustomers:
+          type: boolean
+        status:
+          type: string
+        title:
+          type: string
+        userEmailId:
+          type: string
+        userFirstName:
+          type: string
+        userLastName:
+          type: string
+      title: PartnerOffer
+      type: object
+    CustomerInfo:
+      example:
+        companyName: companyName
+        customerId: customerId
+        customerEntryId: customerEntryId
+      properties:
+        companyName:
+          type: string
+        customerEntryId:
+          type: string
+        customerId:
+          type: string
+      title: CustomerInfo
+      type: object
+    SuccessTrackMapping:
+      example:
+        checklists:
+        - mappingChecklistId: mappingChecklistId
+          checklist: checklist
+          checklistId: checklistId
+        - mappingChecklistId: mappingChecklistId
+          checklist: checklist
+          checklistId: checklistId
+        mappingId: mappingId
+        pitstop: pitstop
+        usecase: usecase
+        pitstopId: pitstopId
+        successTrackId: successTrackId
+        successTrackName: successTrackName
+        usecaseId: usecaseId
+      properties:
+        checklists:
+          items:
+            $ref: '#/components/schemas/SuccessTrackChecklistMapping'
+          type: array
+        mappingId:
+          type: string
+        pitstop:
+          type: string
+        pitstopId:
+          type: string
+        successTrackId:
+          type: string
+        successTrackName:
+          type: string
+        usecase:
+          type: string
+        usecaseId:
+          type: string
+      title: SuccessTrackMapping
+      type: object
+    SuccessTrackChecklistMapping:
+      example:
+        mappingChecklistId: mappingChecklistId
+        checklist: checklist
+        checklistId: checklistId
+      properties:
+        checklist:
+          type: string
+        checklistId:
+          type: string
+        mappingChecklistId:
+          type: string
+      title: SuccessTrackChecklistMapping
+      type: object
+    PartnerOfferWithSessions:
+      example:
+        sessions:
+        - reasonForInterest: reasonForInterest
+          createdDate: 2000-01-23T04:56:07.000+00:00
+          preferredSlot: preferredSlot
+          timezone: timezone
+          modifiedDate: 2000-01-23T04:56:07.000+00:00
+          sessionId: sessionId
+          attendeeList:
+          - attendeeUserEmail: attendeeUserEmail
+            companyName: companyName
+            customerId: customerId
+            ccoId: ccoId
+            attendeeId: attendeeId
+            attendeeUserFullName: attendeeUserFullName
+          - attendeeUserEmail: attendeeUserEmail
+            companyName: companyName
+            customerId: customerId
+            ccoId: ccoId
+            attendeeId: attendeeId
+            attendeeUserFullName: attendeeUserFullName
+          businessOutcome: businessOutcome
+          status: status
+        - reasonForInterest: reasonForInterest
+          createdDate: 2000-01-23T04:56:07.000+00:00
+          preferredSlot: preferredSlot
+          timezone: timezone
+          modifiedDate: 2000-01-23T04:56:07.000+00:00
+          sessionId: sessionId
+          attendeeList:
+          - attendeeUserEmail: attendeeUserEmail
+            companyName: companyName
+            customerId: customerId
+            ccoId: ccoId
+            attendeeId: attendeeId
+            attendeeUserFullName: attendeeUserFullName
+          - attendeeUserEmail: attendeeUserEmail
+            companyName: companyName
+            customerId: customerId
+            ccoId: ccoId
+            attendeeId: attendeeId
+            attendeeUserFullName: attendeeUserFullName
+          businessOutcome: businessOutcome
+          status: status
+        offerId: offerId
+      properties:
+        offerId:
+          type: string
+        sessions:
+          items:
+            $ref: '#/components/schemas/PartnerOfferSession'
+          type: array
+      title: PartnerOfferWithSessions
+      type: object
+    PartnerOfferSession:
+      example:
+        reasonForInterest: reasonForInterest
+        createdDate: 2000-01-23T04:56:07.000+00:00
+        preferredSlot: preferredSlot
+        timezone: timezone
+        modifiedDate: 2000-01-23T04:56:07.000+00:00
+        sessionId: sessionId
+        attendeeList:
+        - attendeeUserEmail: attendeeUserEmail
+          companyName: companyName
+          customerId: customerId
+          ccoId: ccoId
+          attendeeId: attendeeId
+          attendeeUserFullName: attendeeUserFullName
+        - attendeeUserEmail: attendeeUserEmail
+          companyName: companyName
+          customerId: customerId
+          ccoId: ccoId
+          attendeeId: attendeeId
+          attendeeUserFullName: attendeeUserFullName
+        businessOutcome: businessOutcome
+        status: status
+      properties:
+        attendeeList:
+          items:
+            $ref: '#/components/schemas/PartnerOfferAttendee'
+          type: array
+        businessOutcome:
+          type: string
+        createdDate:
+          format: date-time
+          type: string
+        modifiedDate:
+          format: date-time
+          type: string
+        preferredSlot:
+          type: string
+        reasonForInterest:
+          type: string
+        sessionId:
+          type: string
+        status:
+          type: string
+        timezone:
+          type: string
+      title: PartnerOfferSession
+      type: object
+    PartnerOfferAttendee:
+      example:
+        attendeeUserEmail: attendeeUserEmail
+        companyName: companyName
+        customerId: customerId
+        ccoId: ccoId
+        attendeeId: attendeeId
+        attendeeUserFullName: attendeeUserFullName
+      properties:
+        attendeeId:
+          type: string
+        attendeeUserEmail:
+          type: string
+        attendeeUserFullName:
+          type: string
+        ccoId:
+          type: string
+        companyName:
+          type: string
+        customerId:
+          type: string
+      title: PartnerOfferAttendee
+      type: object
+    AssetError:
+      example:
+        severity: Low
+        field: field
+        message: message
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+        severity:
+          enum:
+          - Low
+          - Medium
+          - High
+          type: string
+      title: AssetError
+      type: object
+    DataPaginationResponse:
+      example:
+        data:
+        - "{}"
+        - "{}"
+        totalCount: 0
+      properties:
+        data:
+          items:
+            properties: {}
+            type: object
+          type: array
+        totalCount:
+          format: int64
+          type: integer
+      title: DataPaginationResponse
+      type: object
+    ContractsErrorResponse:
+      properties:
+        message:
+          type: string
+        reason:
+          $ref: '#/components/schemas/Reason'
+        status:
+          format: int32
+          type: integer
+      title: ErrorResponse
+      type: object
+    Reason:
+      properties:
+        errorCode:
+          type: string
+        errorInfo:
+          type: string
+      title: Reason
+      type: object
+  securitySchemes:
+    oAuth2:
+      description: These API required OAuth 2 client credentials grant type Bearer
+        token
+      flows:
+        clientCredentials:
+          scopes: {}
+          tokenUrl: https://cloudsso.cisco.com/as/token.oauth2?
+      type: oauth2
+      x-kong-security-enable: false
+
